@@ -1,6 +1,6 @@
 // src/AddressSearch.js
 import React, { useEffect, useState } from 'react';
-import { Alchemy, Network } from 'alchemy-sdk';
+import { Alchemy, Network, Utils } from 'alchemy-sdk';
 
 // Configures the Alchemy SDK
 const config = {
@@ -43,6 +43,11 @@ function AddressSearch({ match }) {
     fetchAddressDetails();
   }, [address]);
 
+  const formatBalance = (wei) => {
+    const eth = Utils.formatUnits(wei, 'ether');
+    return eth
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4">
       <header className="w-full bg-white shadow-md p-4 mb-4">
@@ -50,13 +55,13 @@ function AddressSearch({ match }) {
       </header>
       <div className="bg-white shadow-md p-6 rounded-lg w-full max-w-4xl">
         <h2 className="text-xl font-semibold mb-2">Address Details</h2>
-        <p className="text-lg"><strong>Balance:</strong> {balance ? `${balance} wei` : 'Loading...'}</p>
+        <p className="text-lg"><strong>Balance:</strong> {balance ? `${formatBalance(balance)} ETH` : 'Loading...'}</p>
         <p className="text-lg"><strong>Transaction Count:</strong> {transactionCount !== null ? transactionCount : 'Loading...'}</p>
         <h2 className="text-xl font-semibold mt-4 mb-2">Transaction History</h2>
         {transfers.length > 0 ? (
-          <ul className="list-disc list-inside">
+          <ul className="">
             {transfers.map((transfer, index) => (
-              <li key={index} className="mb-2">
+              <li key={index} className="m-2 p-2 border rounded-md">
                 <p><strong>Hash:</strong> {transfer.hash}</p>
                 <p><strong>From:</strong> {transfer.from}</p>
                 <p><strong>To:</strong> {transfer.to}</p>
