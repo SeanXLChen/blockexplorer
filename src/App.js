@@ -1,7 +1,11 @@
 import { Alchemy, Network } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
+
 
 import './App.css';
+import AddressSearch from './AddressSearch'; // Ensure the path is correct
+
 
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
@@ -19,10 +23,11 @@ const config = {
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
 const alchemy = new Alchemy(config);
 
-function App() {
+function Home() {
   const [blockNumber, setBlockNumber] = useState();
   const [block, setBlock] = useState();
   const [gasPrice, setGasPrice] = useState();
+  const [address, setAddress] = useState('');
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -38,7 +43,7 @@ function App() {
       // calling the getBlock method to get the latest block
       let response = await alchemy.core.getBlock(blockTagOrHash);
       setBlock(response);
-      console.log(response);
+      // console.log(response);
     }
 
     getBlock();
@@ -58,6 +63,14 @@ function App() {
     return priceInGwei.toFixed(1); // Rounds to one decimal place
   };
 
+  const history = useHistory();
+
+  const handleSearch = () => {
+    if (address) {
+      history.push(`/address/${address}`);
+    }
+  };
+
   return (
     <div className="App">
       <div className="m-5">
@@ -70,8 +83,34 @@ function App() {
       </div>
       <h2>Most-Recently Mined Block Number: {blockNumber}</h2>
       <h2>Block Hash: {block?.hash}</h2>
-
+      <div className="mt-6 w-full max-w-4xl">
+        <input
+          type="text"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className="p-2 border rounded w-full"
+          placeholder="Enter Ethereum address"
+        />
+        <button
+          onClick={handleSearch}
+          className="mt-2 p-2 bg-blue-500 text-white rounded w-full"
+        >
+          Search
+        </button>
+      </div>
     </div>
+  );
+}
+
+
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/" exact component={Home} />
+        <Route path="/address/:address" component={AddressSearch} />
+      </Switch>
+    </Router>
   );
 }
 
