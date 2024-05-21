@@ -6,7 +6,7 @@ import './App.css';
 // Refer to the README doc for more information about using API
 // keys in client-side code. You should never do this in production
 // level code.
-const settings = {
+const config = {
   apiKey: process.env.REACT_APP_ALCHEMY_API_KEY,
   network: Network.ETH_MAINNET,
 };
@@ -17,10 +17,11 @@ const settings = {
 //
 // You can read more about the packages here:
 //   https://docs.alchemy.com/reference/alchemy-sdk-api-surface-overview#api-surface
-const alchemy = new Alchemy(settings);
+const alchemy = new Alchemy(config);
 
 function App() {
   const [blockNumber, setBlockNumber] = useState();
+  const [block, setBlock] = useState();
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -28,9 +29,27 @@ function App() {
     }
 
     getBlockNumber();
-  });
+  }, []);
 
-  return <div className="App">Block Number: {blockNumber}</div>;
+  useEffect(() => {
+    async function getBlock() {
+      let blockTagOrHash = "latest";
+      // calling the getBlock method to get the latest block
+      let response = await alchemy.core.getBlock(blockTagOrHash);
+      setBlock(response);
+      console.log(response);
+    }
+
+    getBlock();
+  }, []);
+
+  return (
+    <div className="App">
+        <h1 className="text-3xl font-bold underline">Block Explorer</h1>
+        <h2>Block Number: {blockNumber}</h2>
+        <h2>Block Hash: {block?.hash}</h2>
+    </div>
+  ) ;
 }
 
 export default App;
