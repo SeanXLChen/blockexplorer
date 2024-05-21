@@ -22,6 +22,7 @@ const alchemy = new Alchemy(config);
 function App() {
   const [blockNumber, setBlockNumber] = useState();
   const [block, setBlock] = useState();
+  const [gasPrice, setGasPrice] = useState();
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -43,13 +44,35 @@ function App() {
     getBlock();
   }, []);
 
+  useEffect(() => {
+    async function fetchGasPrice() {
+      let response = await alchemy.core.getGasPrice();
+      setGasPrice(response._hex);
+    }
+
+    fetchGasPrice();
+  }, []);
+
+  const formatGasPrice = (priceHex) => {
+    const priceInGwei = parseInt(priceHex, 16) / 1e9;
+    return priceInGwei.toFixed(1); // Rounds to one decimal place
+  };
+
   return (
     <div className="App">
-        <h1 className="text-3xl font-bold underline">Block Explorer</h1>
-        <h2>Block Number: {blockNumber}</h2>
-        <h2>Block Hash: {block?.hash}</h2>
+      <div className="m-5">
+        <p className="text-3xl font-bold">Block Explorer</p>
+      </div>
+      <div className="text-xl m-5 flex flex-row justify-center">
+        <h2 className='mr-1'>Gas Price: </h2>
+        <p className='font-bold'>{formatGasPrice(gasPrice)}</p>
+        <h2 className='ml-1'> Gwei</h2>
+      </div>
+      <h2>Most-Recently Mined Block Number: {blockNumber}</h2>
+      <h2>Block Hash: {block?.hash}</h2>
+
     </div>
-  ) ;
+  );
 }
 
 export default App;
